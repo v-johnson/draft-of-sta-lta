@@ -13,7 +13,7 @@ This code applies an STA-LTA method to given data, applying a highpass filter an
 '''
 
 
-# In[ ]:
+# In[1]:
 
 
 import obspy
@@ -29,13 +29,15 @@ from obspy.signal.trigger import z_detect
 from obspy.signal.trigger import classic_sta_lta
 from obspy.signal.trigger import recursive_sta_lta
 
+from obspy import read, read_inventory
+
 import re
 import os
 
 #%matplotlib notebook
 
 
-# In[ ]:
+# In[10]:
 
 
 '''
@@ -48,6 +50,11 @@ Handles instrument response and reads desired files.
 # t2 = UTCDateTime("2011-01-10T00:00:00")
 # st = client.get_waveforms("2C", "BB01", "--", "HHZ", t1, t2, attach_response=True)
 
+
+'''
+Use local data mseed file.
+RESP File name: /data/fast0/datasets/RESP.YE.N303.GPZ.1000SPS.12DB
+'''
 # pre_filt = (0.001, 0.002, 50, 100)
 # # pre_filt = (0.001, 0.002, 0.05, 0.1)
 # # st.remove_response(output='VEL', pre_filt=pre_filt)
@@ -59,6 +66,21 @@ Handles instrument response and reads desired files.
 
 # data = obspy.read('/data/fast1/wip/2C.BB01..HHZ.MSEED') # Whillans Ice Plain
 data = obspy.read('/data/fast1/time/TIME_WAIS_2000_20190105_20190116.mseed') #TIME Data at WAIS
+
+
+st = obspy.read('/data/fast0/datasets/RESP.YE.N303.GPZ.1000SPS.12DB')
+tr = st[0]
+inv = read_inventory() 
+pre_filt = [0.001, 0.005, 45, 50]
+tr.remove_response(inventory = inv,pre_filt=pre_filt, output="DISP",
+                   water_level=60, plot=True)  
+
+
+
+'''
+Note: I have also tried using "None" as a parameter for inventory, as well as not including it at all. 
+And trying to read the .12DB file
+'''
 
 
 # In[ ]:
